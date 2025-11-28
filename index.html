@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecionando...</title>
+    
+    <!-- Pixel Utmify -->
+    <script>
+        window.pixelId = "691fe942077c07a01bdd8fbb";
+        var a = document.createElement("script");
+        a.setAttribute("async", "");
+        a.setAttribute("defer", "");
+        a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+        document.head.appendChild(a);
+    </script>
+    
+    <!-- Script UTMs Utmify -->
+    <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" async defer></script>
+    
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+    <h3>Aguarde... Conectando ao Telegram 🚀</h3>
+    
+    <script>
+        // 🚨 COLOQUE AQUI SUA URL DO N8N (WORKFLOW NOVO)
+        const N8N_URL = "https://n8n-n8n1.yui25m.easypanel.host/webhook/save-tracking"; 
+        const BOT_USER = "juliapriv1_bot";
+
+        async function go() {
+            const params = new URLSearchParams(window.location.search);
+            const data = {};
+            
+            // Captura tudo da URL
+            params.forEach((val, key) => { data[key] = val });
+
+            // Se não tiver UTM, redireciona orgânico
+            if (!data.utm_source && !data.fbclid) {
+                window.location.href = `https://t.me/${BOT_USER}?start=organic`;
+                return;
+            }
+
+            try {
+                // Manda pro N8N e espera o código
+                const req = await fetch(N8N_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const res = await req.json();
+                
+                if (res.code) {
+                    // Redireciona com o código curto!
+                    window.location.href = `https://t.me/${BOT_USER}?start=${res.code}`;
+                } else {
+                    throw new Error("Sem código");
+                }
+            } catch (e) {
+                console.error("ERRO N8N:", e);
+                // Manda o erro na URL para a gente ver o que aconteceu
+                const erroMsg = encodeURIComponent(e.message || "desconhecido");
+                window.location.href = `https://t.me/${BOT_USER}?start=fallback_error_${erroMsg}`;
+            }
+        }
+        go();
+    </script>
+</body>
+</html>
